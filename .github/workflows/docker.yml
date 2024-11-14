@@ -12,6 +12,11 @@ on:
         description: 'version of dummy-blockchain to use (if not specified, will use latest)'
         required: false
         type: string
+      skip_slack_notification:
+        description: 'Set to true to skip Slack notifications'
+        required: false
+        default: false
+        type: boolean
 
 env:
   REGISTRY: ghcr.io
@@ -172,7 +177,7 @@ jobs:
   # properly if not cloned inside `github.com/streamingfast` organization. You need to set up a proper Slack
   # Hook and assign the secrets related to it in GitHub Secrets named `SLACK_WEBHOOK`.
   slack-notifications-vanilla:
-    if: ${{ !startsWith(github.ref, 'refs/tags/') && github.event_name != 'workflow_dispatch' }}
+    if: ${{ !github.event.inputs.skip_slack_notification && !startsWith(github.ref, 'refs/tags/') && github.event_name != 'workflow_dispatch' }}
     needs: [build-vanilla]
     runs-on: ubuntu-20.04
     steps:
@@ -185,7 +190,7 @@ jobs:
             :done: *${{ github.repository }}* Success building docker image from ${{ github.ref_type }} _${{ github.ref_name }}_ (${{ github.actor }}) :sparkling_heart: ```${{ join(needs.build-vanilla.outputs.tags, ' ') }}```
 
   slack-notifications:
-    if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ !github.event.inputs.skip_slack_notification && (startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch') }}
     needs: [build-vanilla, build-bundle]
     runs-on: ubuntu-20.04
     steps:
