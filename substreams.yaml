@@ -2,7 +2,7 @@ specVersion: v0.1.0
 package:
   name: aelf
   version: v1.0.0
-  url: https://github.com/streamingfast/firehose-aelf
+  url: https://github.com/gldeng/firehose-aelf
   doc: |
     Protobuf definitions for developing Substreams AElf modules.
 
