@@ -15,7 +15,7 @@ on:
       skip_slack_notification:
         description: 'Set to true to skip Slack notifications'
         required: false
-        default: false
+        default: true
         type: boolean
 
 env:
