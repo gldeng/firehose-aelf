@@ -9,7 +9,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 RUN rm /etc/localtime && ln -snf /usr/share/zoneinfo/America/Montreal /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
 RUN mkdir -p /app/ && curl -Lo /app/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.12/grpc_health_probe-linux-amd64 && chmod +x /app/grpc_health_probe
 
-ADD /fireacme /app/fireacme
+ADD /fireaelf /app/fireaelf
 
 COPY tools/docker/motd_generic /etc/motd
 COPY tools/docker/99-firehose.sh /etc/profile.d/
@@ -20,4 +20,4 @@ RUN echo ". /etc/profile.d/99-firehose.sh" > /root/.bash_aliases
 
 ENV PATH "$PATH:/app"
 
-ENTRYPOINT ["/app/fireacme"]
+ENTRYPOINT ["/app/fireaelf"]

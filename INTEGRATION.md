@@ -19,12 +19,12 @@ As a reference, here is Ethereum's Protobuf Structure:
 
 We have built an end-to-end template, to start the on-boarding process of new chains. This solution consist of:
 
-*firehose-acme*
+*firehose-aelf*
 As mentioned above, the `Reader` process consumes the data that is extracted and streamed from `Firehose`. In Actuality the Reader
 is one process out of multiple ones that creates the _Firehose_. These processes are launched by one application. This application is
 chain specific and by convention, we name is "firehose-<chain-name>". Though this application is chain specific, the structure of the application
 is standardized and is quite similar from chain to chain. For convenience, we have create a boiler plate app to help you get started.
-We named our chain `Acme` this the app is [firehose-acme](https://github.com/streamingfast/firehose-acme)
+We named our chain `AElf` this the app is [firehose-aelf](https://github.com/streamingfast/firehose-aelf)
 
 *Firehose Logs*
 Firehose logs consist of an instrumented syncing node. We have created a "dummy-blockchain" chain to simulate a node process syncing that can be found [https://github.com/streamingfast/dummy-blockchain](https://github.com/streamingfast/dummy-blockchain).
@@ -47,15 +47,15 @@ Ensure the build was successful
 ./dummy-blockchain --version
 ```
 
-Take note of the location of the built `dummy-blockchain` binary, you will need to configure `firehose-acme` with it.
+Take note of the location of the built `dummy-blockchain` binary, you will need to configure `firehose-aelf` with it.
 
-## Setting up firehose-acme
+## Setting up firehose-aelf
 
 Clone the repository:
 
 ```bash
-git clone git@github.com:streamingfast/firehose-acme.git
-cd firehose-acme
+git clone git@github.com:streamingfast/firehose-aelf.git
+cd firehose-aelf
 ```
 
 Configure firehose test setup
@@ -71,12 +71,12 @@ modify the flag `reader-node-path: "dummy-blockchain"` to point to the path of y
 
 *all subsequent commands are run from the `devel/standard/` directory*
 
-Start `fireacme`
+Start `fireaelf`
 ```bash
 ./start.sh
 ```
 
-This will launch `fireacme` application. Behind the scenes we are starting 3 sub processes: `reader-node`, `relayer`, `firehose`
+This will launch `fireaelf` application. Behind the scenes we are starting 3 sub processes: `reader-node`, `relayer`, `firehose`
 
 *reader-node*
 
@@ -105,7 +105,7 @@ ls -las ./firehose-data/storage/merged-blocks
 We have also built tools that allow you to introspect block files:
 
 ```bash
-go install ../../cmd/fireacme && fireacme tools print blocks --store ./firehose-data/storage/merged-blocks 100
+go install ../../cmd/fireaelf && fireaelf tools print blocks --store ./firehose-data/storage/merged-blocks 100
 ```
 
 At this point we have `reader-node` process running as well a `relayer` & `firehose` process. Both of these processes work together to provide the Firehose data stream.
@@ -118,15 +118,15 @@ grpcurl -plaintext localhost:18015 list
 We can start streaming blocks with `sf.firehose.v2.Stream` Service:
 
 ```bash
-grpcurl -plaintext -d '{"start_block_num": 10}' -import-path ./proto -proto sf/acme/type/v1/type.proto localhost:18015 sf.firehose.v2.Stream.Blocks
+grpcurl -plaintext -d '{"start_block_num": 10}' -import-path ./proto -proto sf/aelf/type/v1/type.proto localhost:18015 sf.firehose.v2.Stream.Blocks
 ```
 
-# Using `firehose-acme` as a template
+# Using `firehose-aelf` as a template
 
-One of the main reason we provide a `firehose-acme` repository is to act as a template element that integrators can use to bootstrap
+One of the main reason we provide a `firehose-aelf` repository is to act as a template element that integrators can use to bootstrap
 creating the required Firehose chain specific code.
 
-We purposely used `Acme` (and also `acme` and `ACME`) throughout this repository so that integrators can simply copy everything and perform
+We purposely used `AElf` (and also `acme` and `AELF`) throughout this repository so that integrators can simply copy everything and perform
 a global search/replace of this word and use their chain name instead.
 
 As well as this, there is a few files that requires a renaming. Would will find below the instructions to properly make the search/replace
@@ -171,8 +171,8 @@ Perform a **case-sensitive** search/replace for the following terms, order is im
 - `owner: streamingfast` -> `owner: <owner>`
 - `fireacme` -> `fire<chain_short>` (for the final binary produced)
 - `acme` -> `<chain>` (for variable, identifier and other place not meant for display, `camelCase`)
-- `Acme` -> `<Chain>` (for title(s) and display of chain's full name, `titleCase`)
-- `ACME` -> `<CHAIN>` (for constants)
+- `AElf` -> `<Chain>` (for title(s) and display of chain's full name, `titleCase`)
+- `AELF` -> `<CHAIN>` (for constants)
 
 > **Note** Don't forget to change `<chain>` (and their variants) by the name of your exact chain like `ethereum` so it would become `ethereum`, `Ethereum` and `ETHEREUM` respectively. The `<chain_short>` should be a shorter version if `<chain>` if you find it too long or have a known short version of it. For example, `ethereum` `<chain_short>` is actually `eth` while `NEAR` chain is the same as `<chain>` so `near`. The `<owner>` value needs to be replaced by GitHub organisation/user that is going to host the `firehose-<chain>` repository, for example if `firehose-ethereum` is going to be hosted at `github.com/ethereum-core/firehose-ethereum`, the `<owner>` here would be `ethereum-core`.
 
@@ -191,10 +191,10 @@ find . -type f -not -path "./.git/*" -exec sd -f c "github.com/streamingfast/fir
 find . -type f -not -path "./.git/*" -exec sd -f c "ghcr.io/streamingfast/firehose-acme" "ghcr.io/$owner/firehose-$chain" {} \;`
 find . -type f -not -path "./.git/*" -exec sd -f c "buf.build/streamingfast/firehose-acme" "buf.build/$owner/firehose-$chain" {} \;`
 find . -type f -not -path "./.git/*" -exec sd -f c "owner: streamingfast" "owner: $owner" {} \;`
-find . -type f -not -path "./.git/*" -exec sd -f c fireacme fire$chain_short {} \;`
+find . -type f -not -path "./.git/*" -exec sd -f c fireaelf fire$chain_short {} \;`
 find . -type f -not -path "./.git/*" -exec sd -f c acme $owner {} \;`
-find . -type f -not -path "./.git/*" -exec sd -f c Acme $chain_title {} \;`
-find . -type f -not -path "./.git/*" -exec sd -f c ACME $chain_constant {} \;`
+find . -type f -not -path "./.git/*" -exec sd -f c AElf $chain_title {} \;`
+find . -type f -not -path "./.git/*" -exec sd -f c AELF $chain_constant {} \;`
 
 ```
 
@@ -253,7 +253,7 @@ Now the main module has its `types` dependency updated with the newly generated 
 
 Doing a Firehose integration means there is an instrumented node that emits Firehose logs (or if not a node directly, definitely a process that reads and emits Firehose logs).
 
-#### [cmd/fireacme/cli/constants.go](cmd/fireacme/cli/constants.go)
+#### [cmd/fireacme/cli/constants.go](cmd/fireaelf/cli/constants.go)
 
 - Replace `ChainExecutableName = "dummy-blockchain"` by the `ChainExecutableName = "<binary>"` where `<binary>` is the node's binary name that should be launched.
 
@@ -299,7 +299,7 @@ If everything is fine at that point, you are ready to commit everything and push
 
 ```
 git add -A .
-git commit -m "Renamed Acme to <Chain>"
+git commit -m "Renamed AElf to <Chain>"
 git add remote origin <url>
 git push
 ```

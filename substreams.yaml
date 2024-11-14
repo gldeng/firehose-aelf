@@ -1,15 +1,15 @@
 specVersion: v0.1.0
 package:
-  name: acme
+  name: aelf
   version: v1.0.0
-  url: https://github.com/streamingfast/firehose-acme
+  url: https://github.com/streamingfast/firehose-aelf
   doc: |
-    Protobuf definitions for developing Substreams Acme modules.
+    Protobuf definitions for developing Substreams AElf modules.
 
     This package does not include any modules.
 
 protobuf:
   files:
-    - sf/acme/type/v1/type.proto
+    - sf/aelf/type/v1/type.proto
   importPaths:
     - ./proto

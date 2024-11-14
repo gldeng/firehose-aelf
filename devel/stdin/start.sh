@@ -3,7 +3,7 @@
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 clean=
-fireacme="$ROOT/../fireacme"
+fireaelf="$ROOT/../fireaelf"
 
 main() {
   pushd "$ROOT" &> /dev/null
@@ -33,7 +33,7 @@ main() {
   #   usage_error "The 'dummy-blockchain' executable must be found within your PATH, install it from source of 'https://github.com/streamingfast/dummy-blockchain'"
   # fi
 
-  exec go run github.com/streamingfast/dummy-blockchain@v1.2.0 start --tracer=firehose --block-rate=60 --store-dir "$chain_data" | $fireacme -c $(basename $ROOT).yaml start "$@"
+  exec go run github.com/streamingfast/dummy-blockchain@v1.2.0 start --tracer=firehose --block-rate=60 --store-dir "$chain_data" | $fireaelf -c $(basename $ROOT).yaml start "$@"
 }
 
 usage_error() {

@@ -16,7 +16,7 @@
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 # Protobuf definitions
-PROTO_ACME=${2:-"$ROOT/proto"}
+PROTO_AELF=${2:-"$ROOT/proto"}
 
 function main() {
   checks
@@ -24,10 +24,10 @@ function main() {
   set -e
   cd "$ROOT/pb" &> /dev/null
 
-  generate "sf/acme/type/v1/type.proto"
+  generate "sf/aelf/type/v1/core.proto sf/aelf/type/v1/kernel.proto"
 
   echo "generate.sh - `date` - `whoami`" > ./last_generate.txt
-  echo "streamingfast/firehose-acme/proto revision: `GIT_DIR=$ROOT/.git git log -n 1 --pretty=format:%h -- proto`" >> ./last_generate.txt
+  echo "streamingfast/firehose-aelf/proto revision: `GIT_DIR=$ROOT/.git git log -n 1 --pretty=format:%h -- proto`" >> ./last_generate.txt
 }
 
 # usage:
@@ -40,7 +40,7 @@ function generate() {
     fi
 
     for file in "$@"; do
-      protoc -I$PROTO_ACME \
+      protoc -I$PROTO_AELF -I./ \
         --go_out=. --go_opt=paths=source_relative \
          $base$file
     done

@@ -1,15 +1,15 @@
 global:
   owner: streamingfast
-  project: firehose-acme
-  binary: fireacme
+  project: firehose-aelf
+  binary: fireaelf
   language: golang
   variant: application
   sfreleaser-min-version: v0.7.0
 release:
   pre-build-hooks:
-    - substreams pack -o "{{ .buildDir }}/substreams-acme-{{ .release.Version }}.spkg" substreams.yaml
+    - substreams pack -o "{{ .buildDir }}/substreams-aelf-{{ .release.Version }}.spkg" substreams.yaml
   upload-extra-assets:
-    - "{{ .buildDir }}/substreams-acme-{{ .release.Version }}.spkg"
+    - "{{ .buildDir }}/substreams-aelf-{{ .release.Version }}.spkg"
 
   # By default we disable Brew publishing because it's assumed that most owner
   # of this repository will not have the a Homebrew tap repository created which

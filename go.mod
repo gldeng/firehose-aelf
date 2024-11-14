@@ -1,4 +1,4 @@
-module github.com/streamingfast/firehose-acme
+module github.com/streamingfast/firehose-aelf
 
 go 1.22
 
