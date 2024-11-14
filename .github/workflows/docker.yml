@@ -181,6 +181,10 @@ jobs:
     needs: [build-vanilla]
     runs-on: ubuntu-20.04
     steps:
+      - name: Debug skip_slack_notification
+        run: |
+          echo "skip_slack_notification: ${{ github.event.inputs.skip_slack_notification }}"
+
       - name: Slack notification
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -202,3 +206,5 @@ jobs:
           args: |
             :done: *${{ github.repository }}* Success building docker images from ${{ github.ref_type }} _${{ github.ref_name }}_ (${{ github.actor }}) :sparkling_heart: ```${{ join(needs.build-vanilla.outputs.tags, ' ') }}
             ${{ needs.build-bundle.outputs.image }}```
+
+
