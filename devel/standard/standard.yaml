@@ -5,6 +5,8 @@ start:
   - reader-node
   - relayer
   flags:
+    advertise-chain-name: aelf
+    advertise-block-id-encoding: hex
     # The dummy block chain genesis block's height is 1
     common-first-streamable-block: 1
 
