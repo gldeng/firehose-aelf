@@ -5,7 +5,13 @@ go 1.22.0
 toolchain go1.23.3
 
 require (
+	github.com/btcsuite/btcutil v1.0.2
+	github.com/streamingfast/bstream v0.0.2-0.20240916154503-c9c5c8bbeca0
 	github.com/streamingfast/firehose-core v1.6.6
+	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
+	github.com/streamingfast/pbgo v0.0.6-0.20240823134334-812f6a16c5cb
+	github.com/test-go/testify v1.1.4
+	go.uber.org/zap v1.26.0
 	google.golang.org/protobuf v1.33.0
 )
 
@@ -127,7 +133,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.15.0 // indirect
-	github.com/streamingfast/bstream v0.0.2-0.20240916154503-c9c5c8bbeca0 // indirect
 	github.com/streamingfast/cli v0.0.4-0.20240412191021-5f81842cb71d // indirect
 	github.com/streamingfast/dauth v0.0.0-20240222213226-519afc16cf84 // indirect
 	github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c // indirect
@@ -138,10 +143,8 @@ require (
 	github.com/streamingfast/dstore v0.1.1-0.20241011152904-9acd6205dc14 // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0 // indirect
-	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
 	github.com/streamingfast/payment-gateway v0.0.0-20240426151444-581e930c76e2 // indirect
-	github.com/streamingfast/pbgo v0.0.6-0.20240823134334-812f6a16c5cb // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20240430173521-888827872b90 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
@@ -164,7 +167,6 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/automaxprocs v1.5.1 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.17.0 // indirect

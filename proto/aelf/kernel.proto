@@ -5,7 +5,7 @@ package aelf;
 import "google/protobuf/timestamp.proto";
 import "aelf/core.proto";
 
-option go_package = "github.com/streamingfast/firehose-aelf/pb/aelf;pbaelf";
+option go_package = "github.com/streamingfast/firehose-aelf/pb/aelf;aelf";
 option csharp_namespace = "AElf.Firehose.Pb";
 
 enum TransactionStatus {
@@ -91,7 +91,6 @@ message BlockHeader {
   Hash merkle_tree_root_of_transaction_status = 10;
   bytes signer_pubkey = 9999;
   bytes signature = 10000;
-  Hash cached_block_hash = 10001;
 }
 
 message FirehoseBlockBody {

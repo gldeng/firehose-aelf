@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package sf.aelf.type.v1;
+
+option go_package= "github.com/streamingfast/firehose-aelf/pb/sf/aelf/type/v1;pbaelf";
+
+import "google/protobuf/timestamp.proto";
+
+message Block {
+  int32 version = 1;
+  string block_hash = 2;
+  int64 height = 3;
+  BlockHeader header = 4;
+  repeated TransactionTrace transaction_traces = 5;
+}
+
+
+message TransactionTrace {
+  string transaction_id = 1;
+  bytes raw_transaction = 2;
+  bytes signature = 3;
+  repeated Call calls = 4;
+  int32 main_call_index = 5;
+}
+
+message Call {
+  // Transaction id format <root_tx_id>:(pre/post:)1:1:1
+  string transaction_id = 1;
+  // sub transactions are `:(pre/post:)1:1:1`
+  string call_path = 2;
+  // The height of the referenced block hash.
+  int64 ref_block_number = 3;
+  // The first four bytes of the referenced block hash.
+  string ref_block_prefix = 4;
+  string from = 5;
+  string to = 6;
+  string method_name = 7;
+  bytes params = 8;
+  ExecutionStatus execution_status = 9;
+  bytes return_value = 10;
+  string error = 11;
+  TransactionExecutingStateSet state_set = 12;
+  repeated LogEvent logs = 13;
+}
+
+enum ExecutionStatus {
+  UNDEFINED = 0;
+  // Successful =>
+  EXECUTED = 1;
+
+  // Failed =>
+  //   Infrastructure reasons
+  CANCELED = -1;
+  SYSTEM_ERROR = -2;
+
+  //   Contract reasons
+  CONTRACT_ERROR = -10;
+  EXCEEDED_MAX_CALL_DEPTH = -11;
+
+  // Pre-failed
+  PREFAILED = -99;
+
+  // Post-failed
+  POSTFAILED = -199;
+}
+
+message TransactionExecutingStateSet {
+  // The changed states.
+  map<string, bytes> writes = 1;
+  // The read states.
+  map<string, bool> reads = 2;
+  // The deleted states.
+  map<string, bool> deletes = 3;
+}
+
+message LogEvent {
+  // The contract address.
+  string address = 1;
+  // The name of the log event.
+  string name = 2;
+  // The indexed data, used to calculate bloom.
+  repeated bytes indexed = 3;
+  // The non indexed data.
+  bytes non_indexed = 4;
+}
+
+
+message BlockHeader {
+  int32 version = 1;
+  int32 chain_id = 2;
+  string previous_block_hash = 3;
+  string merkle_tree_root_of_transactions = 4;
+  string merkle_tree_root_of_world_state = 5;
+  bytes bloom = 6;
+  int64 height = 7;
+  map<string, bytes> extra_data = 8;
+  google.protobuf.Timestamp time = 9;
+  string merkle_tree_root_of_transaction_status = 10;
+  bytes signer_pubkey = 9999;
+  bytes signature = 10000;
+}

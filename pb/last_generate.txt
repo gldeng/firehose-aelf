@@ -1,2 +1,2 @@
-generate.sh - Mon Nov 18 16:13:04 +08 2024 - steven
-streamingfast/firehose-aelf/proto revision: 0382b3d
+generate.sh - Thu Nov 21 13:58:00 +08 2024 - steven
+streamingfast/firehose-aelf/proto revision: 0368e3e

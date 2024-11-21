@@ -24,7 +24,7 @@ function main() {
   set -e
   cd "$ROOT/pb" &> /dev/null
 
-  generate "aelf/core.proto aelf/kernel.proto"
+  generate "aelf/core.proto aelf/kernel.proto sf/aelf/type/v1/type.proto"
 
   echo "generate.sh - `date` - `whoami`" > ./last_generate.txt
   echo "streamingfast/firehose-aelf/proto revision: `GIT_DIR=$ROOT/.git git log -n 1 --pretty=format:%h -- proto`" >> ./last_generate.txt
