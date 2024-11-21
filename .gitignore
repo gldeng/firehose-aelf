@@ -18,6 +18,7 @@
 .envrc*
 *.spkg
 *.env
+buf.gen.yaml
 
 devel/fireaelf
 /build

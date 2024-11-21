@@ -10,7 +10,8 @@ package:
 
 protobuf:
   files:
-    - sf/aelf/type/v1/core.proto
-    - sf/aelf/type/v1/kernel.proto
+    - aelf/core.proto
+    - aelf/kernel.proto
+    - aelf/options.proto
   importPaths:
     - ./proto

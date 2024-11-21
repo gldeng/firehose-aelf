@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
-	pbaelf "github.com/streamingfast/firehose-aelf/pb/sf/aelf/type/v1"
+	pbaelf "github.com/streamingfast/firehose-aelf/pb/aelf"
 	firecore "github.com/streamingfast/firehose-core"
 	fhCmd "github.com/streamingfast/firehose-core/cmd"
 	"github.com/streamingfast/firehose-core/firehose/info"

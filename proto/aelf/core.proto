@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package sf.aelf.type.v1;
+package aelf;
 
 option go_package = "github.com/streamingfast/firehose-aelf/pb/aelf;pbaelf";
 option csharp_namespace = "AElf.Firehose.Pb";
@@ -18,9 +18,14 @@ message Transaction {
   string method_name = 5;
   // The parameters to pass to the smart contract method.
   bytes params = 6;
+  // The id of the parent transaction (for inline transactions)
+  Hash parent_transaction_id = 7;
+  // The id of the root transaction (for inline transactions)
+  Hash root_transaction_id = 8;
   // When signing a transaction it’s actually a subset of the fields: from/to and the target method as well as 
   // the parameter that were given. It also contains the reference block number and prefix.
   bytes signature = 10000;
+  Hash cached_transaction_id = 10001;
 }
 
 message StatePath {
