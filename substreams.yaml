@@ -13,5 +13,6 @@ protobuf:
     - aelf/core.proto
     - aelf/kernel.proto
     - aelf/options.proto
+    - sf/aelf/type/v1/type.proto
   importPaths:
     - ./proto

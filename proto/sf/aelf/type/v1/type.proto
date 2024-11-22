@@ -41,6 +41,7 @@ message Call {
   string error = 11;
   TransactionExecutingStateSet state_set = 12;
   repeated LogEvent logs = 13;
+  bool is_reverted = 14;
 }
 
 enum ExecutionStatus {

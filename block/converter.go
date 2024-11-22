@@ -1,7 +1,6 @@
 package block
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"github.com/streamingfast/firehose-aelf/pb/aelf"
@@ -37,46 +36,19 @@ func convertBlockHeader(left *aelf.BlockHeader) *pbaelf.BlockHeader {
 	}
 }
 
-//func calcBlockHash(header *aelf.BlockHeader) string {
-//	if header.Signature == nil {
-//		serialized, err := proto.Marshal(header)
-//		if err != nil {
-//			log.Fatalf("Failed to marshal message: %v", err)
-//			return ""
-//		}
-//		return calcSha256(serialized)
-//	}
-//	return calcSha256(getBlockHeaderSignatureData(header))
-//}
-//
-//func getBlockHeaderSignatureData(header *aelf.BlockHeader) []byte {
-//	data, err := proto.Marshal(header)
-//	if err != nil {
-//		log.Fatalf("Failed to marshal block header: %v", err)
-//		return nil
-//	}
-//
-//	if header.Signature == nil {
-//		return data
-//	}
-//
-//	// Deserialize the JSON back into a new struct
-//	var cloned aelf.BlockHeader
-//	err = proto.Unmarshal(data, &cloned)
-//	if err != nil {
-//		log.Fatalf("Failed to unmarshal block header: %v", err)
-//		return nil
-//	}
-//	return getBlockHeaderSignatureData(&cloned)
-//}
+type TrackedTransactionTrace struct {
+	*aelf.TransactionTrace
+	PreTrackedTraces    []*TrackedTransactionTrace
+	InlineTrackedTraces []*TrackedTransactionTrace
+	PostTrackedTraces   []*TrackedTransactionTrace
+	IsReverted          bool
+}
 
-func calcSha256(data []byte) string {
-	// Compute SHA-256 hash
-	hash := sha256.New()     // Create a new SHA-256 hash
-	hash.Write([]byte(data)) // Write the data to hash
-	hashSum := hash.Sum(nil) // Get the resulting hash as a byte slice
-
-	return hex.EncodeToString(hashSum)
+func (t *TrackedTransactionTrace) SetReverted() {
+	t.IsReverted = true
+	for _, inlineTrace := range t.InlineTrackedTraces {
+		inlineTrace.SetReverted()
+	}
 }
 
 func prepareTransactionTraces(block *aelf.Block) []*pbaelf.TransactionTrace {
@@ -86,11 +58,11 @@ func prepareTransactionTraces(block *aelf.Block) []*pbaelf.TransactionTrace {
 		tx := block.FirehoseBody.Transactions[i]
 
 		trace := block.FirehoseBody.TransactionTraces[i]
-		calls, mainCallIndex := extractCalls(tx, trace, txId, "", 0)
+		calls, mainCallIndex := extractCalls(tx, convertTraceToTracked(trace), txId, "", 0)
 
 		pbTrace := &pbaelf.TransactionTrace{
 			TransactionId:  txId,
-			RawTransaction: serializeTransaction(tx),
+			RawTransaction: serializeTransaction(tx), // TODO: Check if this is reliable
 			Signature:      tx.Signature,
 			Calls:          calls,
 			MainCallIndex:  mainCallIndex,
@@ -98,6 +70,46 @@ func prepareTransactionTraces(block *aelf.Block) []*pbaelf.TransactionTrace {
 		pbTraces = append(pbTraces, pbTrace)
 	}
 	return pbTraces
+}
+
+func convertTraceToTracked(trace *aelf.TransactionTrace) *TrackedTransactionTrace {
+	var (
+		pre    []*TrackedTransactionTrace
+		inline []*TrackedTransactionTrace
+		post   []*TrackedTransactionTrace
+	)
+	reverted := false
+	for _, preTrace := range trace.PreTraces {
+		convertedPre := convertTraceToTracked(preTrace)
+		pre = append(pre, convertedPre)
+		reverted = reverted || convertedPre.IsReverted
+	}
+	for _, inlineTrace := range trace.InlineTraces {
+		convertedInline := convertTraceToTracked(inlineTrace)
+		inline = append(inline, convertedInline)
+		reverted = reverted || convertedInline.IsReverted
+	}
+	for _, postTrace := range trace.PostTraces {
+		convertedPost := convertTraceToTracked(postTrace)
+		post = append(post, convertedPost)
+		reverted = reverted || convertedPost.IsReverted
+	}
+	reverted = reverted || trace.ExecutionStatus != aelf.ExecutionStatus_EXECUTED
+
+	newTrace := &TrackedTransactionTrace{
+		TransactionTrace:    trace,
+		PreTrackedTraces:    pre,
+		InlineTrackedTraces: inline,
+		PostTrackedTraces:   post,
+		IsReverted:          reverted,
+	}
+
+	if reverted {
+		// need to propagate down the reversion status
+		newTrace.SetReverted()
+	}
+
+	return newTrace
 }
 
 func serializeTransaction(tx *aelf.Transaction) []byte {
@@ -109,12 +121,12 @@ func serializeTransaction(tx *aelf.Transaction) []byte {
 	return data
 }
 
-func extractCalls(tx *aelf.Transaction, trace *aelf.TransactionTrace, txId string, callPathPrefix string, index int) ([]*pbaelf.Call, int32) {
+func extractCalls(tx *aelf.Transaction, trace *TrackedTransactionTrace, txId string, callPathPrefix string, index int) ([]*pbaelf.Call, int32) {
 
 	log.Println(fmt.Sprintf("extract %s %s", txId, callPathPrefix))
 	var flattenedCalls []*pbaelf.Call
 	thisCallPath := fmt.Sprintf("%s:%d", callPathPrefix, index)
-	for i, preTrace := range trace.PreTraces {
+	for i, preTrace := range trace.PreTrackedTraces {
 		preCallPathPrefix := fmt.Sprintf("%s:pre", thisCallPath)
 		preTx := trace.PreTransactions[i]
 		childrenCalls, _ := extractCalls(preTx, preTrace, txId, preCallPathPrefix, i)
@@ -142,11 +154,12 @@ func extractCalls(tx *aelf.Transaction, trace *aelf.TransactionTrace, txId strin
 			Reads:   trace.StateSet.Reads,
 			Deletes: trace.StateSet.Deletes,
 		},
-		Logs: convertLogs(trace.Logs),
+		Logs:       convertLogs(trace.Logs),
+		IsReverted: trace.IsReverted,
 	}
 	flattenedCalls = append(flattenedCalls, mainCall)
 
-	for i, inlineTrace := range trace.InlineTraces {
+	for i, inlineTrace := range trace.InlineTrackedTraces {
 		inlineCallPathPrefix := thisCallPath
 		inlineTx := trace.InlineTransactions[i]
 		childrenCalls, _ := extractCalls(inlineTx, inlineTrace, txId, inlineCallPathPrefix, i)
@@ -154,7 +167,7 @@ func extractCalls(tx *aelf.Transaction, trace *aelf.TransactionTrace, txId strin
 			flattenedCalls = append(flattenedCalls, call)
 		}
 	}
-	for i, postTrace := range trace.PostTraces {
+	for i, postTrace := range trace.PostTrackedTraces {
 		postCallPathPrefix := fmt.Sprintf("%s:post", thisCallPath)
 		postTx := trace.PostTransactions[i]
 		childrenCalls, _ := extractCalls(postTx, postTrace, txId, postCallPathPrefix, i)
