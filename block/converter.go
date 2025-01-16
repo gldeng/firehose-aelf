@@ -59,13 +59,14 @@ func prepareTransactionTraces(block *aelf.Block) []*pbaelf.TransactionTrace {
 
 		trace := block.FirehoseBody.TransactionTraces[i]
 		calls, mainCallIndex := extractCalls(tx, convertTraceToTracked(trace), txId, "", 0)
-
+		initialState := block.FirehoseBody.InitialStates[i]
 		pbTrace := &pbaelf.TransactionTrace{
-			TransactionId:  txId,
-			RawTransaction: serializeTransaction(tx), // TODO: Check if this is reliable
-			Signature:      tx.Signature,
-			Calls:          calls,
-			MainCallIndex:  mainCallIndex,
+			TransactionId:      txId,
+			RawTransaction:     serializeTransaction(tx), // TODO: Check if this is reliable
+			Signature:          tx.Signature,
+			Calls:              calls,
+			MainCallIndex:      mainCallIndex,
+			InitialStateValues: initialState.Values,
 		}
 		pbTraces = append(pbTraces, pbTrace)
 	}

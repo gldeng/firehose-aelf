@@ -21,6 +21,7 @@ message TransactionTrace {
   bytes signature = 3;
   repeated Call calls = 4;
   int32 main_call_index = 5;
+  map<string,bytes> initial_state_values = 6;
 }
 
 message Call {
